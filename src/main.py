@@ -3,7 +3,7 @@ from collections import Counter
 from enum import Enum
 
 
-class CardEnum(Enum):
+class WarCardEnum(Enum):
     ACE = 14
     JACK = 11
     QUEEN = 12
@@ -18,7 +18,7 @@ class CardEnum(Enum):
             return str(value)
 
 
-class Card:
+class WarCard:
     def __init__(self, value: int, color: str | None = None):
         """Represents a playing card."""
         self.value = value
@@ -29,69 +29,54 @@ class Card:
 
     def __str__(self):
         return (
-            f"{CardEnum.name_safe(self.value).capitalize()} of {self.color}"
+            f"{WarCardEnum.name_safe(self.value).capitalize()} of {self.color}"
             if self.color
-            else CardEnum.name_safe(self.value).capitalize()
+            else WarCardEnum.name_safe(self.value).capitalize()
         )
 
     def __eq__(self, other):
-        if not isinstance(other, Card):
-            return NotImplemented
-        return self.value == other.value and self.color == other.color
-
-    def __ne__(self, other):
-        if not isinstance(other, Card):
-            return NotImplemented
-        return not self.__eq__(other)
-
-
-class WarCard(Card):
-    def __init__(self, value: int, color: str | None = None):
-        super().__init__(value, color)
-
-    def __eq__(self, other):
-        if not isinstance(other, Card):
+        if not isinstance(other, WarCard):
             return NotImplemented
         return self.value == other.value
 
     def __ne__(self, other):
-        if not isinstance(other, Card):
+        if not isinstance(other, WarCard):
             return NotImplemented
         return not self.__eq__(other)
 
     def __gt__(self, other):
-        if not isinstance(other, Card):
+        if not isinstance(other, WarCard):
             return NotImplemented
         return self.value > other.value
 
     def __lt__(self, other):
-        if not isinstance(other, Card):
+        if not isinstance(other, WarCard):
             return NotImplemented
         return self.value < other.value
 
     def __ge__(self, other):
-        if not isinstance(other, Card):
+        if not isinstance(other, WarCard):
             return NotImplemented
         return self.value >= other.value
 
     def __le__(self, other):
-        if not isinstance(other, Card):
+        if not isinstance(other, WarCard):
             return NotImplemented
         return self.value <= other.value
 
 
 class WarDeck:
     def __init__(self, deck: list[WarCard]):
-        self.cards = deck
+        self.__cards = deck
 
     def __len__(self):
-        return len(self.cards)
+        return len(self.__cards)
 
     def shuffle(self):
-        random.shuffle(self.cards)
+        random.shuffle(self.__cards)
 
-    def pop(self, _i) -> Card:
-        return self.cards.pop(_i)
+    def pop(self, _i) -> WarCard:
+        return self.__cards.pop(_i)
 
 
 class WarGame:
@@ -110,18 +95,16 @@ class WarGame:
         colors = ["heart", "diamonds", "spades", "clubs"]
         deck = [WarCard(value, color) for value in range(2, 15) for color in colors]
         # Add two jokers
-        deck.append(Card(CardEnum.JOKER.value))
-        deck.append(Card(CardEnum.JOKER.value))
+        deck.append(WarCard(WarCardEnum.JOKER.value))
+        deck.append(WarCard(WarCardEnum.JOKER.value))
         self.war_deck = WarDeck(deck)
         self.war_deck.shuffle()
 
     def deal_cards(self, cards_per_deal: int = 1):
         if self.war_deck is None:
             raise ValueError("Deck has not been created.")
-
         player_hands = [[] for _ in range(self.num_players)]
         players = range(self.num_players)
-
         while len(self.war_deck) > 0:
             for player in players:
                 if len(self.war_deck) == 0:
@@ -134,7 +117,7 @@ class WarGame:
         print(len(self.war_deck))
         self.player_hands = player_hands
 
-    def get_equal_cards(self, round_cards: list[Card]) -> list[Card]:
+    def get_equal_cards(self, round_cards: list[WarCard]) -> list[WarCard]:
         value_counts = Counter(card.value for card in round_cards)
         equal_values = {value for value, count in value_counts.items() if count > 1}
         return [card for card in round_cards if card.value in equal_values]
@@ -159,20 +142,20 @@ class WarGame:
 
         max_card = max(round_cards, key=lambda card: card.value)
 
-        war_happend = False
+        war_happened = False
         # detect equal value cards
         round_values = [card.value for card in round_cards]
         if len(round_values) != len(set(round_values)):
             print("At least two players have equal cards in this round.")
-            # if they are biggest cards in round, trigger war
+            # if they are the biggest cards in round, trigger war
             equal_cards = self.get_equal_cards(round_cards)
             print(f"{len(equal_cards)} cards [{equal_cards}] equal in this round.")
             if any(card == max_card for card in equal_cards):
                 print("Equal cards are the biggest in this round, triggering war...")
                 round_cards, round_winner = self.war(round_cards)
-                war_happend = True
+                war_happened = True
 
-        if not war_happend:
+        if not war_happened:
             round_winner = round_cards.index(max_card)
         self.player_hands[round_winner].extend(round_cards)
 
@@ -187,7 +170,7 @@ class WarGame:
 
 
 if __name__ == "__main__":
-    wg = WarGame(num_players=10)
+    wg = WarGame(num_players=5)
     wg.prepare_deck()
     wg.deal_cards(1)
 
@@ -197,7 +180,7 @@ if __name__ == "__main__":
 
     jh = 0
     while not wg.game_over:
-    # while "pigs" != "fly":
+        # while "pigs" != "fly":
         wg.play_tick()
         jh += 1
         print(jh)
