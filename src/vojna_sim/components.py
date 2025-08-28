@@ -1,7 +1,8 @@
+import logging
 import random
 from enum import Enum
 
-
+log = logging.getLogger(__name__)
 class WarCardEnum(Enum):
     ACE = 14
     JACK = 11
@@ -90,7 +91,7 @@ class CurrentRoundCards:
 
     @property
     def max(self):
-        max_card = max(self.values)
+        max_card = max(self.values, key=lambda card: card.value if card is not None else 0)
         return max_card
 
     @property

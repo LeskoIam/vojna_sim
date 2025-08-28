@@ -1,7 +1,4 @@
-import random
-from collections import Counter
-
-from src.components import WarCard, WarCardEnum, WarDeck, CurrentRoundCards
+from vojna_sim.components import WarCard, WarCardEnum, WarDeck
 
 
 class WarGame:

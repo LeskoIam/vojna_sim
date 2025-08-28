@@ -24,6 +24,25 @@ push = true
     'version = "{version}"'
 ]
 
+[tool.pytest.ini_options]
+pythonpath = [
+    "src",
+]
+
+
+# Logging config
+## General logging
+log_format = "%(asctime)s [%(levelname)8s] (%(filename)s:%(lineno)s) %(message)s"
+log_date_format = "%d.%m.%Y %H:%M:%S"
+log_level = "INFO"
+
+# CLI specific logging
+log_cli = true
+log_cli_level = "INFO"
+
+## File specific logging
+log_file_level = "NOTSET"
+
 
 [tool.ruff]
 target-version = "py312"
@@ -113,3 +132,8 @@ unfixable = ["B"]
 quote-style = "double"
 indent-style = "space"
 line-ending = "auto"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+]
